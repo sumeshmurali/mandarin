@@ -29,6 +29,8 @@ type Endpoint struct {
 
 type ServerConfig struct {
 	Port uint16 `mapstructure:"port"`
+	Ratelimit int `mapstructure:"ratelimit"`
+	RatelimitType string `mapstructure:"ratelimit_type"`
 }
 
 type Server struct {
