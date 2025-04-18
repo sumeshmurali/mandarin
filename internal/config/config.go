@@ -11,33 +11,36 @@ type RequestConfig struct {
 }
 
 type ResponseConfig struct {
-	Headers map[string]string `mapstructure:"headers"`
-	Body string `mapstructure:"body"`
-	StatusCode int `mapstructure:"status_code"`
+	Headers    map[string]string `mapstructure:"headers"`
+	Body       string            `mapstructure:"body"`
+	StatusCode int               `mapstructure:"status_code"`
 }
 
+type RatelimitConfig struct {
+	Ratelimit     int    `mapstructure:"ratelimit"`
+	RatelimitType string `mapstructure:"ratelimit_type"`
+}
 type EndpointConfig struct {
 }
 type Endpoint struct {
-	Description string `mapstructure:"description"`
-	Name string `mapstructure:"name"`
-	Template string `mapstructure:"template"`
+	Description    string          `mapstructure:"description"`
+	Name           string          `mapstructure:"name"`
+	Template       string          `mapstructure:"template"`
 	EndpointConfig *EndpointConfig `mapstructure:"config"`
-	RequestConfig *RequestConfig `mapstructure:"request_config"`
+	RequestConfig  *RequestConfig  `mapstructure:"request_config"`
 	ResponseConfig *ResponseConfig `mapstructure:"response_config"`
 }
 
 type ServerConfig struct {
-	Port uint16 `mapstructure:"port"`
-	Ratelimit int `mapstructure:"ratelimit"`
-	RatelimitType string `mapstructure:"ratelimit_type"`
+	Port            uint16           `mapstructure:"port"`
+	RatelimitConfig *RatelimitConfig `mapstructure:"ratelimit_config"`
 }
 
 type Server struct {
-	Name string `mapstructure:"name"`
-	Description string `mapstructure:"description"`
-	Endpoints map[string]Endpoint `mapstructure:"endpoints"`
-	ServerConfig *ServerConfig `mapstructure:"config"`
+	Name         string              `mapstructure:"name"`
+	Description  string              `mapstructure:"description"`
+	Endpoints    map[string]Endpoint `mapstructure:"endpoints"`
+	ServerConfig *ServerConfig       `mapstructure:"config"`
 }
 
 func ParseConfiguration(configpath string) (*Server, error) {
@@ -49,7 +52,7 @@ func ParseConfiguration(configpath string) (*Server, error) {
 	defer file.Close()
 	viper.SetConfigType("yaml")
 	err = viper.ReadConfig(file)
-	if err != nil {	
+	if err != nil {
 		return nil, err
 	}
 

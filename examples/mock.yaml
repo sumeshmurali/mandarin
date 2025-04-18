@@ -3,8 +3,9 @@ name: Mock Server
 description: Mock server for testing
 config:
   port: 8081
-  ratelimit: 1 # requests per second
-  ratelimit_type: global
+  ratelimit_config:
+    ratelimit: 1 # requests per second
+    ratelimit_type: global
 endpoints:
   /:
     description: Root endpoint

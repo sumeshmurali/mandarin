@@ -3,6 +3,7 @@ package ratelimiter
 import (
 	"net/http"
 
+	"github.com/sumeshmurali/mandarin/internal/config"
 	"golang.org/x/time/rate"
 )
 
@@ -37,11 +38,11 @@ func (r *GlobalRatelimiter) Allow(_ *http.Request) bool {
 	return r.limiter.Allow()
 }
 
-func NewRateLimiter(ratelimiterType string, ratelimit int) Ratelimiter {
-	switch ratelimiterType {
+func NewRateLimiter(config *config.RatelimitConfig) Ratelimiter {
+	switch config.RatelimitType {
 	case "global":
 		return &GlobalRatelimiter{
-			limiter: rate.NewLimiter(rate.Limit(ratelimit), ratelimit),
+			limiter: rate.NewLimiter(rate.Limit(config.Ratelimit), config.Ratelimit),
 		}
 	}
 	return nil

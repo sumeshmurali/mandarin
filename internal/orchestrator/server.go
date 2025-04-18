@@ -19,8 +19,8 @@ var ErrServerFailed = errors.New("server failed")
 func (s *Server) Run(config *config.Server) error {
 	fmt.Printf("%+v", config)
 	var rl ratelimiter.Ratelimiter
-	if config.ServerConfig.Ratelimit != 0 {
-		rl = ratelimiter.NewRateLimiter(config.ServerConfig.RatelimitType, config.ServerConfig.Ratelimit)
+	if config.ServerConfig.RatelimitConfig != nil {
+		rl = ratelimiter.NewRateLimiter(config.ServerConfig.RatelimitConfig)
 	}
 	var ratelimitMiddleWare = ratelimiter.RatelimitedHandlerMiddleWareCurry(rl)
 
