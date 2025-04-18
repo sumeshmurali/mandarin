@@ -18,15 +18,3 @@ endpoints:
     ratelimit_config:
       ratelimit: 1 # requests per second
       ratelimit_type: global
-  /api/hello:
-    description: Root endpoint
-    request_config:
-      allowed_methods:
-        - GET
-        - POST
-    response_config:
-      status_code: 200
-      headers:
-        Content-Type: application/json
-      body: "{\"message\": \"Hello, World!\"}"
-    
