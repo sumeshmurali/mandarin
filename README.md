@@ -1,6 +1,8 @@
 # mandarin
 Free to use fake/mock api server suite for developers, product managers and for load testing
 
+**Note: Under development. Not ready for production use yet**
+
 ## Example Configuration
 ```yaml
 name: Mock Server
@@ -24,7 +26,7 @@ endpoints:
       ratelimit_type: global
 ```
 
-
+q
 # Docker Usage
 
 1. Clone the repo
