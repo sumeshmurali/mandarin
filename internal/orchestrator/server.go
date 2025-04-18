@@ -17,7 +17,6 @@ type Server struct {
 var ErrServerFailed = errors.New("server failed")
 
 func (s *Server) Run(config *config.Server) error {
-	fmt.Printf("%+v", config)
 	var globalRl ratelimiter.Ratelimiter
 	if config.ServerConfig.RatelimitConfig != nil {
 		globalRl = ratelimiter.NewRateLimiter(config.ServerConfig.RatelimitConfig)
