@@ -1,0 +1,29 @@
+
+name: Mock Server
+description: Mock server for testing
+config:
+  port: 8081
+endpoints:
+  /:
+    description: Root endpoint
+    request_config:
+      allowed_methods:
+        - GET
+        - POST
+    response_config:
+      status_code: 200
+      headers:
+        Content-Type: application/json
+      body: "{\"message\": \"Hello, World!\"}"
+  /api/hello:
+    description: Root endpoint
+    request_config:
+      allowed_methods:
+        - GET
+        - POST
+    response_config:
+      status_code: 200
+      headers:
+        Content-Type: application/json
+      body: "{\"message\": \"Hello, World!\"}"
+    
