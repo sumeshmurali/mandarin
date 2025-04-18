@@ -18,20 +18,25 @@ var ErrServerFailed = errors.New("server failed")
 
 func (s *Server) Run(config *config.Server) error {
 	fmt.Printf("%+v", config)
-	var rl ratelimiter.Ratelimiter
+	var globalRl ratelimiter.Ratelimiter
 	if config.ServerConfig.RatelimitConfig != nil {
-		rl = ratelimiter.NewRateLimiter(config.ServerConfig.RatelimitConfig)
+		globalRl = ratelimiter.NewRateLimiter(config.ServerConfig.RatelimitConfig)
 	}
-	var ratelimitMiddleWare = ratelimiter.RatelimitedHandlerMiddleWareCurry(rl)
+	var ratelimitMiddleWare = ratelimiter.RatelimitedHandlerMiddleWareCurry(globalRl)
 
 	mux := http.NewServeMux()
 	for name, endpoint := range config.Endpoints {
+		rlMiddleWare := ratelimitMiddleWare
+		if endpoint.RatelimitConfig != nil {
+			rl := ratelimiter.NewRateLimiter(endpoint.RatelimitConfig)
+			rlMiddleWare = ratelimiter.RatelimitedHandlerMiddleWareCurry(rl)
+		}
 		if endpoint.Template != "" {
 			t, err := prebuilttemplates.GetTemplate(endpoint.Template)
 			if err != nil {
 				return err
 			}
-			mux.HandleFunc(name, ratelimitMiddleWare(t))
+			mux.HandleFunc(name, rlMiddleWare(t))
 			continue
 		}
 		if endpoint.RequestConfig != nil && endpoint.ResponseConfig != nil {
@@ -39,7 +44,7 @@ func (s *Server) Run(config *config.Server) error {
 			if err != nil {
 				return err
 			}
-			mux.HandleFunc(name, ratelimitMiddleWare(h))
+			mux.HandleFunc(name, rlMiddleWare(h))
 		}
 
 	}

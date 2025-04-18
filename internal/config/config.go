@@ -23,12 +23,13 @@ type RatelimitConfig struct {
 type EndpointConfig struct {
 }
 type Endpoint struct {
-	Description    string          `mapstructure:"description"`
-	Name           string          `mapstructure:"name"`
-	Template       string          `mapstructure:"template"`
-	EndpointConfig *EndpointConfig `mapstructure:"config"`
-	RequestConfig  *RequestConfig  `mapstructure:"request_config"`
-	ResponseConfig *ResponseConfig `mapstructure:"response_config"`
+	Description     string           `mapstructure:"description"`
+	Name            string           `mapstructure:"name"`
+	Template        string           `mapstructure:"template"`
+	EndpointConfig  *EndpointConfig  `mapstructure:"config"`
+	RequestConfig   *RequestConfig   `mapstructure:"request_config"`
+	ResponseConfig  *ResponseConfig  `mapstructure:"response_config"`
+	RatelimitConfig *RatelimitConfig `mapstructure:"ratelimit_config"`
 }
 
 type ServerConfig struct {
