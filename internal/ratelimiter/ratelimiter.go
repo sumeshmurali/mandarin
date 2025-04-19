@@ -30,14 +30,6 @@ func RatelimitedHandlerMiddleWareCurry(rl Ratelimiter) func(http.HandlerFunc) ht
 	}
 }
 
-type GlobalRatelimiter struct {
-	limiter *rate.Limiter
-}
-
-func (r *GlobalRatelimiter) Allow(_ *http.Request) bool {
-	return r.limiter.Allow()
-}
-
 func NewRateLimiter(config *config.RatelimitConfig) Ratelimiter {
 	switch config.RatelimitType {
 	case "global":
@@ -47,3 +39,25 @@ func NewRateLimiter(config *config.RatelimitConfig) Ratelimiter {
 	}
 	return nil
 }
+
+type GlobalRatelimiter struct {
+	limiter *rate.Limiter
+}
+
+func (r *GlobalRatelimiter) Allow(_ *http.Request) bool {
+	return r.limiter.Allow()
+}
+
+// type TokenEnforcedRatelimiter struct {
+// 	limiter map[string]*rate.Limiter
+// 	wlock   *sync.Mutex
+// }
+
+// func (r *TokenEnforcedRatelimiter) GetOrCreateLimiter(rq *http.Request) *rate.Limiter {
+// 	r.wlock.Lock()
+// 	defer r.wlock.Unlock()
+// 	if _, ok := r.limiter[r.RemoteAddr]; !ok {
+// 		r.limiter[r.RemoteAddr] = rate.NewLimiter(rate.Limit(1), 1)
+// 	}
+// 	return r.limiter[r.RemoteAddr]
+// }

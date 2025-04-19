@@ -1,6 +1,7 @@
 package orchestrator
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -12,9 +13,18 @@ import (
 )
 
 type Server struct {
+	server   *http.Server
+	starting chan struct{}
 }
 
 var ErrServerFailed = errors.New("server failed")
+
+func NewServer() *Server {
+	return &Server{
+		starting: make(chan struct{}),
+		server:   &http.Server{},
+	}
+}
 
 func (s *Server) Run(config *config.Server) error {
 	var globalRl ratelimiter.Ratelimiter
@@ -54,15 +64,26 @@ func (s *Server) Run(config *config.Server) error {
 		port = 80
 
 	}
-	server := http.Server{
-		Handler: mux,
-		Addr:    fmt.Sprintf(":%d", port),
-	}
+	s.server.Handler = mux
+	s.server.Addr = fmt.Sprintf(":%d", port)
+
 	fmt.Printf("Starting server %s on port %d\n", config.Name, port)
-	err := server.ListenAndServe()
-	if err != nil {
+	close(s.starting)
+	err := s.server.ListenAndServe()
+	if err != nil && err != http.ErrServerClosed {
 		log.Fatal("Server failed ", err)
 		return errors.Join(err, ErrServerFailed)
 	}
 	return nil
+}
+
+func (s *Server) Shutdown() {
+	if err := s.server.Shutdown(context.Background()); err != nil {
+		// Error from closing listeners, or context timeout:
+		log.Printf("HTTP server Shutdown: %v", err)
+	}
+}
+
+func (s *Server) WaitForStartup() {
+	<-s.starting
 }
