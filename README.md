@@ -26,7 +26,6 @@ endpoints:
       ratelimit_type: global
 ```
 
-q
 # Docker Usage
 
 1. Clone the repo
