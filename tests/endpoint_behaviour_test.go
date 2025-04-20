@@ -108,8 +108,10 @@ func TestRatelimitGlobal(t *testing.T) {
 				},
 				Endpoints: map[string]config.Endpoint{
 					"/": {
-						Template:        "echo",
-						RatelimitConfig: &config.RatelimitConfig{Ratelimit: ratelimit, RatelimitType: "global"},
+						Template: "echo",
+						EndpointConfig: &config.EndpointConfig{
+							RatelimitConfig: &config.RatelimitConfig{Ratelimit: ratelimit, RatelimitType: "global"},
+						},
 					},
 				},
 			},

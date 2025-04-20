@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/sumeshmurali/mandarin/internal/config"
 	prebuilttemplates "github.com/sumeshmurali/mandarin/internal/prebuilt_templates"
@@ -28,24 +29,36 @@ func NewServer() *Server {
 
 func (s *Server) Run(config *config.Server) error {
 	var globalRl ratelimiter.Ratelimiter
-	if config.ServerConfig.RatelimitConfig != nil {
+	if config.ServerConfig != nil && config.ServerConfig.RatelimitConfig != nil {
 		globalRl = ratelimiter.NewRateLimiter(config.ServerConfig.RatelimitConfig)
 	}
 	var ratelimitMiddleWare = ratelimiter.RatelimitedHandlerMiddleWareCurry(globalRl)
-
+	var delay int
+	if config.ServerConfig != nil {
+		delay = config.ServerConfig.Delay
+	}
+	var delayMiddleWare = DelayMiddleWare(delay)
 	mux := http.NewServeMux()
 	for name, endpoint := range config.Endpoints {
 		rlMiddleWare := ratelimitMiddleWare
-		if endpoint.RatelimitConfig != nil {
-			rl := ratelimiter.NewRateLimiter(endpoint.RatelimitConfig)
-			rlMiddleWare = ratelimiter.RatelimitedHandlerMiddleWareCurry(rl)
+		delayMW := delayMiddleWare
+
+		if endpoint.EndpointConfig != nil {
+			if endpoint.EndpointConfig.RatelimitConfig != nil {
+				rl := ratelimiter.NewRateLimiter(endpoint.EndpointConfig.RatelimitConfig)
+				rlMiddleWare = ratelimiter.RatelimitedHandlerMiddleWareCurry(rl)
+			}
+			if endpoint.EndpointConfig.Delay != 0 {
+				delayMW = DelayMiddleWare(endpoint.EndpointConfig.Delay)
+			}
 		}
+
 		if endpoint.Template != "" {
 			t, err := prebuilttemplates.GetTemplate(endpoint.Template)
 			if err != nil {
 				return err
 			}
-			mux.HandleFunc(name, rlMiddleWare(t))
+			mux.HandleFunc(name, rlMiddleWare(delayMW(t)))
 			continue
 		}
 		if endpoint.RequestConfig != nil && endpoint.ResponseConfig != nil {
@@ -53,7 +66,7 @@ func (s *Server) Run(config *config.Server) error {
 			if err != nil {
 				return err
 			}
-			mux.HandleFunc(name, rlMiddleWare(h))
+			mux.HandleFunc(name, rlMiddleWare(delayMW(h)))
 		}
 
 	}
@@ -86,4 +99,16 @@ func (s *Server) Shutdown() {
 
 func (s *Server) WaitForStartup() {
 	<-s.starting
+}
+
+func DelayMiddleWare(delay int) func(http.HandlerFunc) http.HandlerFunc {
+	return func(next http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			if delay > 0 {
+				// Simulate delay
+				time.Sleep(time.Duration(delay) * time.Millisecond)
+			}
+			next(w, r)
+		}
+	}
 }

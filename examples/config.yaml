@@ -2,7 +2,8 @@
 name: Mock Server
 description: Mock server for testing
 config:
-  port: 80
+  port: 8080
+  delay: 5000 # milliseconds
 endpoints:
   /:
     description: Root endpoint
@@ -15,6 +16,9 @@ endpoints:
       headers:
         Content-Type: application/json
       body: "{\"message\": \"Hello, World!\"}"
-    ratelimit_config:
-      ratelimit: 1 # requests per second
-      ratelimit_type: global
+    config:
+      ratelimit_config:
+        ratelimit: 1 # requests per second
+        ratelimit_type: global
+      delay: 1000 # milliseconds
+      

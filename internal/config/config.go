@@ -21,20 +21,22 @@ type RatelimitConfig struct {
 	RatelimitType string `mapstructure:"ratelimit_type"`
 }
 type EndpointConfig struct {
+	RatelimitConfig *RatelimitConfig `mapstructure:"ratelimit_config"`
+	Delay           int              `mapstructure:"delay"`
 }
 type Endpoint struct {
-	Description     string           `mapstructure:"description"`
-	Name            string           `mapstructure:"name"`
-	Template        string           `mapstructure:"template"`
-	EndpointConfig  *EndpointConfig  `mapstructure:"config"`
-	RequestConfig   *RequestConfig   `mapstructure:"request_config"`
-	ResponseConfig  *ResponseConfig  `mapstructure:"response_config"`
-	RatelimitConfig *RatelimitConfig `mapstructure:"ratelimit_config"`
+	Description    string          `mapstructure:"description"`
+	Name           string          `mapstructure:"name"`
+	Template       string          `mapstructure:"template"`
+	EndpointConfig *EndpointConfig `mapstructure:"config"`
+	RequestConfig  *RequestConfig  `mapstructure:"request_config"`
+	ResponseConfig *ResponseConfig `mapstructure:"response_config"`
 }
 
 type ServerConfig struct {
 	Port            uint16           `mapstructure:"port"`
 	RatelimitConfig *RatelimitConfig `mapstructure:"ratelimit_config"`
+	Delay           int              `mapstructure:"delay"`
 }
 
 type Server struct {

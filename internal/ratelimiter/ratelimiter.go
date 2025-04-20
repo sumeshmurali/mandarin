@@ -47,17 +47,3 @@ type GlobalRatelimiter struct {
 func (r *GlobalRatelimiter) Allow(_ *http.Request) bool {
 	return r.limiter.Allow()
 }
-
-// type TokenEnforcedRatelimiter struct {
-// 	limiter map[string]*rate.Limiter
-// 	wlock   *sync.Mutex
-// }
-
-// func (r *TokenEnforcedRatelimiter) GetOrCreateLimiter(rq *http.Request) *rate.Limiter {
-// 	r.wlock.Lock()
-// 	defer r.wlock.Unlock()
-// 	if _, ok := r.limiter[r.RemoteAddr]; !ok {
-// 		r.limiter[r.RemoteAddr] = rate.NewLimiter(rate.Limit(1), 1)
-// 	}
-// 	return r.limiter[r.RemoteAddr]
-// }
